@@ -163,16 +163,16 @@ namespace ThreadTest
         #endregion
 
         #region Example 6  线程优先级
-        static void Main(string[] args)
-        {
-            Console.WriteLine("当前线程优先级（priority）: {0}", Thread.CurrentThread.Priority);
-            Console.WriteLine("不限定计算机处理器核数进行计算与输出！");
-            RunThreads();//不限定处理器核数，并开启线程
-            Thread.Sleep(TimeSpan.FromSeconds(2));
-            Console.WriteLine("设置当前为单核处理器并进行计算与输出！");
-            Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(1);
-            RunThreads();//限定为单核处理器并进行计算与输出！
-        }
+        //static void Main(string[] args)
+        //{
+        //    Console.WriteLine("当前线程优先级（priority）: {0}", Thread.CurrentThread.Priority);
+        //    Console.WriteLine("不限定计算机处理器核数进行计算与输出！");
+        //    RunThreads();//不限定处理器核数，并开启线程
+        //    Thread.Sleep(TimeSpan.FromSeconds(2));
+        //    Console.WriteLine("设置当前为单核处理器并进行计算与输出！");
+        //    Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(1);
+        //    RunThreads();//限定为单核处理器并进行计算与输出！
+        //}
         /// <summary>
         /// 开启两个线程，并调用计数器
         /// </summary>
@@ -219,16 +219,18 @@ namespace ThreadTest
         //static void Main(string[] args)
         //{
 
+        //    //匿名委托方式传递参数
         //    var t = new Thread(() => PrintNumber(20));
         //    t.Name = "匿名委托线程一";
-        //    var t2 = new Thread(() => PrintStr("输出字符串"));
+        //    var t2 = new Thread(() => PrintStr("匿名委托线程二传递过来的参数"));
         //    t2.Name = "匿名委托线程二";
         //    t.Start();
         //    t2.Start();
 
+        //    //调用ParameterizedThreadStart委托
         //    Thread t3 = new Thread(new ParameterizedThreadStart(PrintStr));
         //    t3.Name = "调用ParameterizedThreadStart委托线程三";
-        //    t3.Start("我是传递过来的参数");
+        //    t3.Start("调用ParameterizedThreadStart传递过来的参数");
 
         //}
         ///// <summary>
@@ -237,7 +239,7 @@ namespace ThreadTest
         ///// <param name="number"></param>
         //static void PrintNumber(int number)
         //{
-        //    Console.WriteLine("{0}的值为：{1}", Thread.CurrentThread.Name, number);
+        //    Console.WriteLine("{0}的值为：【{1}】", Thread.CurrentThread.Name, number);
         //}
 
         ///// <summary>
@@ -263,7 +265,7 @@ namespace ThreadTest
         #region Example 9 lock参数使用
         //static void Main(string[] args)
         //{
-        //    Console.WriteLine("Incorrect counter");
+        //    Console.WriteLine("错误计算：");
 
         //    var c = new Counter();
 
@@ -274,10 +276,10 @@ namespace ThreadTest
         //    t1.Join();
         //    t2.Join();
 
-        //    Console.WriteLine("Total count: {0}", c.Count);
+        //    Console.WriteLine("结果为: {0}", c.Count);
         //    Console.WriteLine("--------------------------");
 
-        //    Console.WriteLine("Correct counter");
+        //    Console.WriteLine("正确计算：");
 
         //    var c1 = new CounterWithLock();
 
@@ -287,7 +289,7 @@ namespace ThreadTest
         //    t2.Start();
         //    t1.Join();
         //    t2.Join();
-        //    Console.WriteLine("Total count: {0}", c1.Count);
+        //    Console.WriteLine("结果为: {0}", c1.Count);
 
         //}
 
@@ -312,11 +314,11 @@ namespace ThreadTest
         //    Console.WriteLine("----------------------------------");
         //    lock (lock2)
         //    {
-        //        Console.WriteLine("将会造成死锁!");
+        //        Console.WriteLine("主线程锁定lock2输出!");
         //        Thread.Sleep(1000);
         //        lock (lock1)
         //        {
-        //            Console.WriteLine("成功请求被保护资源！");
+        //            Console.WriteLine("主线程锁定lock1输出！");
         //        }
         //    }
         //}
@@ -329,8 +331,9 @@ namespace ThreadTest
         //{
         //    lock (lock1)
         //    {
+        //        Console.WriteLine("子线程锁定lock1输出!");
         //        Thread.Sleep(1000);
-        //        lock (lock2) ;
+        //        lock (lock2) { Console.WriteLine("子线程锁定lock2输出！"); }
         //    }
         //}
         #endregion
@@ -342,17 +345,20 @@ namespace ThreadTest
         //    object lock2 = new object();
 
         //    new Thread(() => LockTooMuch(lock1, lock2)).Start();
-        //    lock (lock2)
+        //    for (int i = 0; i < 2; i++)
         //    {
-        //        Thread.Sleep(1000); 
-        //        Console.WriteLine("Monitor.TryEnter在经过指定时间内无法拿到所需资源，则返回false，这可避免死锁！");
-        //        if (Monitor.TryEnter(lock1, TimeSpan.FromSeconds(5)))//如果当前线程获得锁，则为true；否则为false。
+        //        lock (lock2)
         //        {
-        //            Console.WriteLine("成功请求被保护资源！");
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine("资源请求超时！");
+        //            Thread.Sleep(1000);
+        //            Console.WriteLine("Monitor.TryEnter在经过指定时间内无法拿到所需资源，则返回false，这可避免死锁！");
+        //            if (Monitor.TryEnter(lock1, TimeSpan.FromSeconds(5)))//如果当前线程获得锁，则为true；否则为false。
+        //            {
+        //                Console.WriteLine("主线程：成功请求被保护资源！");
+        //            }
+        //            else
+        //            {
+        //                Console.WriteLine("主线程：资源请求超时！");
+        //            }
         //        }
         //    }
         //}
@@ -366,56 +372,57 @@ namespace ThreadTest
         //{
         //    lock (lock1)
         //    {
+        //        Console.WriteLine("子线程锁定lock1输出!");
         //        Thread.Sleep(1000);
-        //        lock (lock2) ;
+        //        lock (lock2) { Console.WriteLine("子线程锁定lock2输出！"); }
         //    }
         //}
         #endregion
 
         #region Example 12 异常处理
-        //static void Main(string[] args)
-        //{
-        //    //创建一个子线程，并在子线程中捕获异常，可正常通过
-        //    var t = new Thread(FaultyThread);
-        //    t.Start();
-        //    t.Join();
+        static void Main(string[] args)
+        {
+            //创建一个子线程，并在子线程中捕获异常，可正常通过
+            var t = new Thread(FaultyThread);
+            t.Start();
+            t.Join();
 
-        //    try
-        //    {
-        //        //在主线程中捕获子线程的异常，无法捕获，会直接在子线程中抛出
-        //        t = new Thread(BadFaultyThread);
-        //        t.Start();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("We won't get here!");
-        //    }
-        //}
-        ///// <summary>
-        ///// 子线程中抛出，想要主线程捕获（但事实上主线程是无法捕获的）
-        ///// </summary>
-        //static void BadFaultyThread()
-        //{
-        //    Console.WriteLine("Starting a faulty thread...");
-        //    Thread.Sleep(TimeSpan.FromSeconds(2));
-        //    throw new Exception("Boom!");//debug模式下会走这一句
-        //}
-        ///// <summary>
-        ///// 子线程中捕获异常
-        ///// </summary>
-        //static void FaultyThread()
-        //{
-        //    try
-        //    {
-        //        Console.WriteLine("Starting a faulty thread...");
-        //        Thread.Sleep(TimeSpan.FromSeconds(1));
-        //        throw new Exception("Boom!");//debug模式下会走catch
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("Exception handled: {0}", ex.Message);
-        //    }
-        //}
+            try
+            {
+                //在主线程中捕获子线程的异常，无法捕获，会直接在子线程中抛出
+                t = new Thread(BadFaultyThread);
+                t.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("捕获到了子线程异常：{0}",ex.Message);
+            }
+        }
+        /// <summary>
+        /// 子线程中抛出，想要主线程捕获（但事实上主线程是无法捕获的）
+        /// </summary>
+        static void BadFaultyThread()
+        {
+            Console.WriteLine("下面将会抛出一个异常，但是不想自己处理，想给主线程处理！");
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+            throw new Exception("Boom!");//debug模式下会走这一句
+        }
+        /// <summary>
+        /// 子线程中捕获异常
+        /// </summary>
+        static void FaultyThread()
+        {
+            try
+            {
+                Console.WriteLine("下面将会抛出一个异常，将自己主动处理！");
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+                throw new Exception("Boom!");//debug模式下会走catch
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FaultyThread()方法中捕获到了线程的异常: {0}", ex.Message);
+            }
+        }
         #endregion
 
     }
